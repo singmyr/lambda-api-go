@@ -12,6 +12,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
@@ -88,7 +89,18 @@ func Handler(ctx context.Context) (Response, error) {
 
 func ListByYear(year string) ([]Item, error) {
 	// Build the Dynamo client object
-	sess := session.Must(session.NewSession())
+	// sess := session.Must(session.NewSession())
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		Config: aws.Config{
+			Region: aws.String("eu-west-1"),
+			Credentials: credentials.NewStaticCredentialsFromCreds(credentials.Value{
+				AccessKeyID:     "KEY",
+				SecretAccessKey: "SECRET",
+			}),
+		},
+		Profile: "default",
+	}))
+	fmt.Println(sess)
 	svc := dynamodb.New(sess)
 	items := []Item{}
 
